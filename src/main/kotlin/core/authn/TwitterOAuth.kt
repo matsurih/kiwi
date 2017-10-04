@@ -10,23 +10,23 @@ import java.net.URLEncoder
 import java.nio.charset.Charset
 import java.util.*
 
-/**
- * Created by matsurihime on 2017/10/04.
- */
 class TwitterOAuth {
     var token : String? = ""
-    private val BASE_URL = "https://api.twitter.com"
+    private val baseUrl = "https://api.twitter.com"
 
+    /**
+     * Execute OAuth Request
+     */
     fun executeOAuth() {
         val config = Config.get()
-        if(config == null) return
+        config ?: return
         val key = "Basic " + createEncodedKey(config.consumerKey, config.consumerSecret)
         val value = RequestBody.create(MediaType.parse("text/plain"), "grant_type=client_credentials")
 
         val retrofit = Retrofit.Builder()
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(MoshiConverterFactory.create())
-                .baseUrl(BASE_URL)
+                .baseUrl(baseUrl)
                 .build()
         val service = retrofit.create(TwitterOAuthService::class.java)
         service.authenticate(key, value)
@@ -42,16 +42,27 @@ class TwitterOAuth {
                 })
     }
 
+    /**
+     * Create Encoded Key
+     * @param key consumer_key
+     * @param secret consumer_secret
+     */
     private fun createEncodedKey(key: String, secret: String): String{
         val encodedKey = key.toRFC1738()
         val encodedSecret = secret.toRFC1738()
         return (encodedKey + ":" + encodedSecret).toBase64()
     }
 
+    /**
+     * Encode to Base64
+     */
     private fun String.toBase64(): String{
         return Base64.getEncoder().encode(this.toByteArray()).toString(Charset.defaultCharset())
     }
 
+    /**
+     * Encode to RFC1738 format
+     */
     private fun String.toRFC1738(): String{
         return URLEncoder.encode(this, "UTF-8")
     }
