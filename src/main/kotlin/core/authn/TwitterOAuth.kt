@@ -1,5 +1,6 @@
 package core.authn
 
+import logging.Logger
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import retrofit2.Retrofit
@@ -11,6 +12,7 @@ import java.nio.charset.Charset
 import java.util.*
 
 class TwitterOAuth {
+    private val className = this::class.java.simpleName
     var token : String? = ""
     private val baseUrl = "https://api.twitter.com"
 
@@ -31,11 +33,11 @@ class TwitterOAuth {
         val service = retrofit.create(TwitterOAuthService::class.java)
         service.authenticate(key, value)
                 .subscribe({ ret ->
-                    println(ret.message())
-                    println(ret.code())
-                    println(ret.errorBody()?.string())
-                    println("TYPE: " + ret.body()?.token_type)
-                    println("TOKEN: " + ret.body()?.access_token)
+                    Logger.d(ret.message(), className)
+                    Logger.d(ret.code().toString(), className)
+                    Logger.d(ret.errorBody()?.string()?: "", className)
+                    Logger.d("TYPE: ${ret.body()?.token_type}", className)
+                    Logger.d("TOKEN: ${ret.body()?.access_token}", className)
                     token = ret.body()?.access_token
                 }, { error ->
                     error.printStackTrace()

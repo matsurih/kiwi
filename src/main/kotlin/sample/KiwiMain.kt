@@ -2,9 +2,11 @@ package sample
 
 import core.authn.TwitterOAuth
 import core.stream.TwitterTimeline
+import logging.Logger
 
 val screenNamePublic = "himematsuri"
 val screenNamePrivate = "mmvnvn"
+val className = "KiwiMain"
 
 fun main(args: Array<String>){
     val oauth = TwitterOAuth()
@@ -16,12 +18,11 @@ fun main(args: Array<String>){
     // user_timeline
     timeline.getUserTimeline(token, screenNamePublic)
 
-    println("------------------------")
+    Logger.d("------------------------", className)
 
     // search
     timeline.searchTweets(token, "東京")
 
-    println("------------------------")
+    Logger.d("------------------------", className)
 
-    
 }

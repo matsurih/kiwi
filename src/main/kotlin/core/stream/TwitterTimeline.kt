@@ -1,6 +1,7 @@
 package core.stream
 
 import com.squareup.moshi.Moshi
+import logging.Logger
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import retrofit2.Retrofit
@@ -9,6 +10,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import util.Config
 
 class TwitterTimeline {
+    private val className = this::class.java.simpleName
     private val baseUrl = "https://api.twitter.com"
 
     fun getUserTimeline(token: String, screenName: String) {
@@ -25,12 +27,12 @@ class TwitterTimeline {
         val service = retrofit.create(TwitterTimelineService::class.java)
         service.getUserTimeline(bearer, screenName)
                 .subscribe({ ret ->
-                    println(ret.message())
-                    println(ret.code())
-                    println(ret.headers())
-                    println(ret.errorBody()?.string())
+                    Logger.d(ret.message(), className)
+                    Logger.d(ret.code().toString(), className)
+                    Logger.d(ret.headers().toString(), className)
+                    Logger.d(ret.errorBody()?.string()?:"", className)
                     ret.body()?.forEach {status ->
-                        println("[" + status.created_at + "] @" + status.user.name +" (" + status.user.screen_name + ") " + status.text)
+                        Logger.d("[${status.created_at}] ${status.user.name} (@${status.user.screen_name}) ${status.text}", className)
                     }
                 }, { error ->
                     error.printStackTrace()
@@ -51,12 +53,12 @@ class TwitterTimeline {
         val service = retrofit.create(TwitterTimelineService::class.java)
         service.searchTweets(bearer, query)
                 .subscribe({ ret ->
-                    println(ret.message())
-                    println(ret.code())
-                    println(ret.headers())
-                    println(ret.errorBody()?.string())
+                    Logger.d(ret.message(), className)
+                    Logger.d(ret.code().toString(), className)
+                    Logger.d(ret.headers().toString(), className)
+                    Logger.d(ret.errorBody()?.string()?: "", className)
                     ret.body()?.statuses?.forEach {status ->
-                        println("[" + status.created_at + "] @" + status.user.name +" (" + status.user.screen_name + ") " + status.text)
+                        Logger.d("[${status.created_at}] ${status.user.name} (@${status.user.screen_name}) ${status.text}", className)
                     }
                 }, { error ->
                     error.printStackTrace()
