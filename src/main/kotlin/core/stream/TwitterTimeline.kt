@@ -21,13 +21,14 @@ class TwitterTimeline {
                 .addConverterFactory(MoshiConverterFactory.create().asLenient())
                 .baseUrl(baseUrl)
                 .build()
+
         val service = retrofit.create(TwitterTimelineService::class.java)
         service.getTimeLine(bearer, screenName)
                 .subscribe({ ret ->
                     println(ret.message())
                     println(ret.code())
+                    println(ret.headers())
                     println(ret.errorBody()?.string())
-                    println(ret.body().toString())
                     ret.body()?.forEach {status ->
                         println("[" + status.created_at + "] @" + status.user.name +" (" + status.user.screen_name + ") " + status.text)
                     }

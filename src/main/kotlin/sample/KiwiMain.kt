@@ -1,4 +1,4 @@
-package core
+package sample
 
 import core.authn.TwitterOAuth
 import core.stream.TwitterTimeline
