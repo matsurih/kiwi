@@ -9,6 +9,10 @@ data class Entities(
         val polls: List<Poll>
 )
 
+data class ExtendedEntities(
+        val media: List<Media>
+)
+
 data class HashTag(
         val indices: List<Int>,
         val text: String
@@ -51,7 +55,7 @@ data class Url(
 
 data class UserMention(
         val id: Long,
-        val id_str: Integer,
+        val id_str: String,
         val indices: List<Int>,
         val name: String,
         val screen_name: String

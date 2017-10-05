@@ -28,7 +28,7 @@ data class Tweet(
         val retweet_count: Int,
         val favorite_count: Int?,
         val entities: Entities,
-        val extended_entities: List<Media>?,
+        val extended_entities: ExtendedEntities?,
         val favorited: Boolean?,
         val retweeted: Boolean,
         val possibly_sensitive: Boolean?,

@@ -11,7 +11,7 @@ import util.Config
 class TwitterTimeline {
     private val baseUrl = "https://api.twitter.com"
 
-    fun getTimeLine(token: String, screenName: String) {
+    fun getUserTimeline(token: String, screenName: String) {
         val config = Config.get()
         config ?: return
         val bearer = "Bearer " + token
@@ -23,13 +23,39 @@ class TwitterTimeline {
                 .build()
 
         val service = retrofit.create(TwitterTimelineService::class.java)
-        service.getTimeLine(bearer, screenName)
+        service.getUserTimeline(bearer, screenName)
                 .subscribe({ ret ->
                     println(ret.message())
                     println(ret.code())
                     println(ret.headers())
                     println(ret.errorBody()?.string())
                     ret.body()?.forEach {status ->
+                        println("[" + status.created_at + "] @" + status.user.name +" (" + status.user.screen_name + ") " + status.text)
+                    }
+                }, { error ->
+                    error.printStackTrace()
+                })
+    }
+
+    fun searchTweets(token: String, query: String){
+        val config = Config.get()
+        config ?: return
+        val bearer = "Bearer " + token
+
+        val retrofit = Retrofit.Builder()
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(MoshiConverterFactory.create().asLenient())
+                .baseUrl(baseUrl)
+                .build()
+
+        val service = retrofit.create(TwitterTimelineService::class.java)
+        service.searchTweets(bearer, query)
+                .subscribe({ ret ->
+                    println(ret.message())
+                    println(ret.code())
+                    println(ret.headers())
+                    println(ret.errorBody()?.string())
+                    ret.body()?.statuses?.forEach {status ->
                         println("[" + status.created_at + "] @" + status.user.name +" (" + status.user.screen_name + ") " + status.text)
                     }
                 }, { error ->
