@@ -1,4 +1,4 @@
-package core.authn
+package authn
 
 import io.reactivex.Observable
 import mold.AuthenticationMold

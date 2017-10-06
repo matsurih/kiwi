@@ -1,4 +1,4 @@
-package core.authn
+package authn
 
 import logging.Logger
 import okhttp3.MediaType

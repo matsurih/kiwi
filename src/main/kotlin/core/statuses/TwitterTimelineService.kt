@@ -1,4 +1,4 @@
-package core.stream
+package core.statuses
 
 import io.reactivex.Observable
 import mold.SearchResult

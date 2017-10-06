@@ -1,22 +1,18 @@
-package core.stream
+package core.account
 
-import com.squareup.moshi.Moshi
 import logging.Logger
-import okhttp3.MediaType
-import okhttp3.RequestBody
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import util.Config
 
-class TwitterTimeline {
+class AccountHandler{
     private val className = this::class.java.simpleName
     private val baseUrl = "https://api.twitter.com"
 
-    fun getUserTimeline(token: String, screenName: String) {
+    fun getAccountSettings(token: String){
         val config = Config.get()
         config ?: return
-        val bearer = "Bearer " + token
 
         val retrofit = Retrofit.Builder()
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -24,25 +20,23 @@ class TwitterTimeline {
                 .baseUrl(baseUrl)
                 .build()
 
-        val service = retrofit.create(TwitterTimelineService::class.java)
-        service.getUserTimeline(bearer, screenName)
+        val service = retrofit.create(AccountService::class.java)
+        service.getAccountSettings(token)
                 .subscribe({ ret ->
                     Logger.d(ret.message(), className)
                     Logger.d(ret.code().toString(), className)
                     Logger.d(ret.headers().toString(), className)
                     Logger.d(ret.errorBody()?.string()?:"", className)
-                    ret.body()?.forEach {status ->
-                        Logger.d("[${status.created_at}] ${status.user.name} (@${status.user.screen_name}) ${status.text}", className)
-                    }
+                    val user  = ret.body()
+                    Logger.d("${user?.screen_name}", className)
                 }, { error ->
                     error.printStackTrace()
                 })
     }
 
-    fun searchTweets(token: String, query: String){
+    fun verifyCredentials(token: String){
         val config = Config.get()
         config ?: return
-        val bearer = "Bearer " + token
 
         val retrofit = Retrofit.Builder()
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -50,16 +44,15 @@ class TwitterTimeline {
                 .baseUrl(baseUrl)
                 .build()
 
-        val service = retrofit.create(TwitterTimelineService::class.java)
-        service.searchTweets(bearer, query)
+        val service = retrofit.create(AccountService::class.java)
+        service.verifyCredentials(token)
                 .subscribe({ ret ->
                     Logger.d(ret.message(), className)
                     Logger.d(ret.code().toString(), className)
                     Logger.d(ret.headers().toString(), className)
-                    Logger.d(ret.errorBody()?.string()?: "", className)
-                    ret.body()?.statuses?.forEach {status ->
-                        Logger.d("[${status.created_at}] ${status.user.name} (@${status.user.screen_name}) ${status.text}", className)
-                    }
+                    Logger.d(ret.errorBody()?.string()?:"", className)
+                    val user  = ret.body()
+                    Logger.d("${user?.screen_name}", className)
                 }, { error ->
                     error.printStackTrace()
                 })

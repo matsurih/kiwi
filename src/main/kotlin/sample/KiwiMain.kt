@@ -1,7 +1,7 @@
 package sample
 
-import core.authn.TwitterOAuth
-import core.stream.TwitterTimeline
+import authn.TwitterOAuth
+import core.statuses.TwitterTimeline
 import logging.Logger
 
 val screenNamePublic = "himematsuri"
