@@ -1,19 +1,18 @@
 package sample
 
 import authn.TwitterOAuth
-import core.statuses.TwitterTimeline
+import core.statuses.Statuses
 import logging.Logger
 
 val screenNamePublic = "himematsuri"
-val screenNamePrivate = "mmvnvn"
 val className = "KiwiMain"
 
-fun main(args: Array<String>){
+fun main2(args: Array<String>){
     val oauth = TwitterOAuth()
     oauth.executeOAuth()
     val token = oauth.token
     token?: return
-    val timeline = TwitterTimeline()
+    val timeline = Statuses()
 
     // user_timeline
     timeline.getUserTimeline(token, screenNamePublic)
@@ -25,4 +24,10 @@ fun main(args: Array<String>){
 
     Logger.d("------------------------", className)
 
+}
+
+fun main(args: Array<String>){
+    val status = Statuses()
+    val text = "ツイートテストだよ"
+    status.updateTweet(text, null)
 }
