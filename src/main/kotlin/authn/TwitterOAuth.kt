@@ -1,5 +1,6 @@
 package authn
 
+import http.KiwiRetrofit
 import logging.Logger
 import okhttp3.MediaType
 import okhttp3.RequestBody
@@ -7,6 +8,7 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import util.Config
+import util.ContentTypes
 import java.net.URLEncoder
 import java.nio.charset.Charset
 import java.util.*
@@ -14,7 +16,6 @@ import java.util.*
 class TwitterOAuth {
     private val className = this::class.java.simpleName
     var token : String? = ""
-    private val baseUrl = "https://api.twitter.com"
 
     /**
      * Execute OAuth Request
@@ -23,19 +24,11 @@ class TwitterOAuth {
         val config = Config.get()
         config ?: return
         val key = "Basic " + createEncodedKey(config.consumerKey, config.consumerSecret)
-        val value = RequestBody.create(MediaType.parse("text/plain"), "grant_type=client_credentials")
-
-        val retrofit = Retrofit.Builder()
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(MoshiConverterFactory.create())
-                .baseUrl(baseUrl)
-                .build()
-        val service = retrofit.create(TwitterOAuthService::class.java)
+        val value = RequestBody.create(MediaType.parse(ContentTypes.TEXT_PLAIN), "grant_type=client_credentials")
+        val service = KiwiRetrofit.createService(TwitterOAuthService::class.java)
         service.authenticate(key, value)
                 .subscribe({ ret ->
-                    Logger.d(ret.message(), className)
-                    Logger.d(ret.code().toString(), className)
-                    Logger.d(ret.errorBody()?.string()?: "", className)
+                    KiwiRetrofit.outputResult(ret, className)
                     Logger.d("TYPE: ${ret.body()?.token_type}", className)
                     Logger.d("TOKEN: ${ret.body()?.access_token}", className)
                     token = ret.body()?.access_token
