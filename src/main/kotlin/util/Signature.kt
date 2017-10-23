@@ -1,6 +1,6 @@
 package util
 
-import logging.Logger
+import authn.TwitterOAuth2
 import java.net.URLEncoder
 import java.util.*
 import javax.crypto.Mac
@@ -9,24 +9,18 @@ import javax.crypto.spec.SecretKeySpec
 class Signature {
     companion object {
         private val className = this::class.java.simpleName
-
         private var oauthConsumerKey = Config.config?.consumerKey
         private var oauthConsumerSecret = Config.config?.consumerSecret
-
-        private var oauthToken = "USER'S OAUTH TOKEN"
-        private var oauthTokenSecret = "USER'S OAUTH TOKEN SECRET"
-        
-
-        private val oauthSignatureMethod = "HMAC-SHA1"
-        private val oauthVersion = "1.0"
+        private const val OAUTH_SIGNATURE_METHOD = "HMAC-SHA1"
+        private const val OAUTH_VERSION = "1.0"
 
         fun createAuthorizationHeader(method: String, url: String, params: MutableMap<String, String?>?): String {
             params?.put("oauth_consumer_key", this.oauthConsumerKey)
             params?.put("oauth_nonce", this.createNonce())
-            params?.put("oauth_signature_method", this.oauthSignatureMethod)
+            params?.put("oauth_signature_method", OAUTH_SIGNATURE_METHOD)
             params?.put("oauth_timestamp", this.epochSeconds())
-            params?.put("oauth_token", this.oauthToken)
-            params?.put("oauth_version", this.oauthVersion)
+            params?.put("oauth_token", TwitterOAuth2.oauthToken)
+            params?.put("oauth_version", OAUTH_VERSION)
             val signature = sign(method, url, params)
             params?.put("oauth_signature", signature)
             return "OAuth " + createAuthorizationParams(params)
@@ -37,12 +31,8 @@ class Signature {
             val urlEncoded = percentEncode(url)
             val paramsEncoded = percentEncode(params)
             val signingValue = "$methodEncoded&$urlEncoded&$paramsEncoded"
-            Logger.d(signingValue, className)
-
             val signingKey = percentEncode(oauthConsumerSecret ?: "") +
-                    "&" + percentEncode(oauthTokenSecret)
-            Logger.d(signingKey, className)
-
+                    "&" + percentEncode(TwitterOAuth2.oauthTokenSecret)
             val sks = SecretKeySpec(signingKey.toByteArray(), "HmacSHA1")
             val mac = Mac.getInstance("HmacSHA1")
             mac.init(sks)
@@ -54,16 +44,15 @@ class Signature {
             return "oauth_consumer_key=\"$oauthConsumerKey\", " +
                     "oauth_nonce=\"" + params?.get("oauth_nonce")+ "\", " +
                     "oauth_signature=\""+ percentEncode(params?.get("oauth_signature")) +"\", " +
-                    "oauth_signature_method=\"$oauthSignatureMethod\", " +
+                    "oauth_signature_method=\"$OAUTH_SIGNATURE_METHOD\", " +
                     "oauth_timestamp=\"" + params?.get("oauth_timestamp") + "\", " +
-                    "oauth_token=\"$oauthToken\", " +
-                    "oauth_version=\"$oauthVersion\""
+                    "oauth_token=\"${TwitterOAuth2.oauthToken}\", " +
+                    "oauth_version=\"$OAUTH_VERSION\""
         }
 
         private fun createNonce(): String {
             val random = ByteArray(32)
             Random().nextBytes(random)
-           // return String(Base64.getEncoder().encode(random))
             return System.currentTimeMillis().toString()
         }
 

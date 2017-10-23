@@ -18,7 +18,7 @@ interface StatusesService {
 
     @POST("$ROOT/update.json")
     @Headers("Content-Type: application/x-www-form-urlencoded;charset=UTF-8", "User-Agent: Kiwi")
-    fun update(@Header("Authorization") authorization: String, @Body() body: RequestBody): Observable<Response<Tweet>>
+    fun update(@Header("Authorization") signature: String, @Body() body: RequestBody): Observable<Response<Tweet>>
 
     @Deprecated("This API was deprecated by Twitter.")
     @POST("$ROOT/")
